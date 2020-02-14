@@ -7,7 +7,7 @@ images: one to blur the image and one to set the luminance (or brightness) of
 the image.
 '''
 from PIL import Image
-
+import numpy as np
 
 def blur(fptr, mask=3):
     '''
@@ -42,12 +42,25 @@ def blur(fptr, mask=3):
 
     for x in range(width):
         for y in range(height):
+            
             pxl = img.getpixel((x, y))
-
-            ### INSERT YOUR CODE HERE
-            raise Exception("Blurred pxl must still be calculated.")
-
+            lst = []
+            
+            xi_lowest = max(0, x - mask) 
+            xi_highest = min(x + mask, width - 1)
+            yi_lowest = max(0, y - mask) 
+            yi_highest = min(y + mask, height - 1)
+            
+            for xi in range(xi_lowest, xi_highest):
+                for yi in range(yi_lowest, yi_highest):
+                    lst.append(img.getpixel((xi, yi)))
+            
+            lst_np = np.array(lst)
+            
+            blur = tuple(sum(lst_np) // len(lst))
+            
             img.putpixel((x, y), blur)
+            
     # Save both images so we can verify if we changed the correct one.
     base_name = '.'.join(fptr.split(".")[0:-1])
     fptr_2 = base_name + "_blurred.png"
