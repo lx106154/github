@@ -1,7 +1,7 @@
 '''
 EN.640.635 Software Carpentry
 Lab 2 - PIL Image Blurring and Luminance
-
+Completed by: Zhezhi Chen
 In this lab assignment, we want to write two functions that can manipulate
 images: one to blur the image and one to set the luminance (or brightness) of
 the image.
@@ -42,25 +42,25 @@ def blur(fptr, mask=3):
 
     for x in range(width):
         for y in range(height):
-            
+
             pxl = img.getpixel((x, y))
             lst = []
-            
-            xi_lowest = max(0, x - mask) 
+            # Setup the range limit for mask
+            xi_lowest = max(0, x - mask)
             xi_highest = min(x + mask, width - 1)
-            yi_lowest = max(0, y - mask) 
+            yi_lowest = max(0, y - mask)
             yi_highest = min(y + mask, height - 1)
-            
+
             for xi in range(xi_lowest, xi_highest):
                 for yi in range(yi_lowest, yi_highest):
                     lst.append(img.getpixel((xi, yi)))
-            
+
             lst_np = np.array(lst)
-            
+
             blur = tuple(sum(lst_np) // len(lst))
-            
+
             img.putpixel((x, y), blur)
-            
+
     # Save both images so we can verify if we changed the correct one.
     base_name = '.'.join(fptr.split(".")[0:-1])
     fptr_2 = base_name + "_blurred.png"
@@ -97,9 +97,28 @@ def set_luminance(fptr, l_val):
 
         None
     '''
+    img = Image.open(fptr).convert("RGB")
+    # Calculate the total luminace of the image
+    total_lum = get_luminance(img)
 
-    ### INSERT YOUR CODE HERE
-    raise Exception("Function still needs to be defined.")
+    # Calculate the multiplier
+    multiplier = l_val / total_lum
+
+    # Reset the RGB value for each pixel
+    width, height = img.size
+    for x in range(width):
+        for y in range(height):
+            pxl = img.getpixel((x, y))
+            red = min(255, round(pxl[0] * multiplier))
+            green = min(255, round(pxl[1] * multiplier))
+            blue = min(255, round(pxl[2] * multiplier))
+            pxl_lum = (red, green, blue)
+            img.putpixel((x, y), pxl_lum)
+
+    # Save the new image
+    base_name = '.'.join(fptr.split(".")[0:-1])
+    fptr_2 = base_name + "_luminated.png"
+    img.save(fptr_2)
 
 
 def get_pxl_luminance(pxl):
@@ -116,9 +135,9 @@ def get_pxl_luminance(pxl):
         l_val: *float*
             The pixel luminance.
     '''
+    l_pxl = 0.299 * pxl[0] + 0.587 * pxl[1] + 0.114 * pxl[2]
+    return l_pxl
 
-    ### INSERT YOUR CODE HERE
-    raise Exception("Function still needs to be defined.")
 
 
 def get_luminance(img):
@@ -136,11 +155,16 @@ def get_luminance(img):
             The image luminance.
     '''
 
-    ### INSERT YOUR CODE HERE
-    raise Exception("Function still needs to be defined.")
+    width, height = img.size
+    pxl_lst = []
+    for x in range(width):
+        for y in range(height):
+            pxl_lst.append(get_pxl_luminance(img.getpixel((x, y))))
 
+    l_val = sum(pxl_lst) / len(pxl_lst)
+    return l_val
 
 if __name__ == "__main__":
-    fptr = "cat.jpg"
+    fptr = "dog.jpg"
     blur(fptr)
     set_luminance(fptr, 150.0)
