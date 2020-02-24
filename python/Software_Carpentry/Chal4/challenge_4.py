@@ -55,7 +55,7 @@ def generate_key():
     D = 2
     while (D * E - 1) % X != 0:
         D = D + 1
-    print("The keys are here: N=", N, "E=", E, "D=", D)
+    print("The keys are here: N =", N, "E =", E, "D =", D)
     return (N, E, D)
 
 NED = generate_key()
