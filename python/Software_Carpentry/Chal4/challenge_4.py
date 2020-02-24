@@ -46,7 +46,7 @@ def get_prime_divisors(N):
 
 
 def generate_key():
-    P, Q = random.sample(get_primes_in_range(130, 500), 2)
+    P, Q = random.sample(get_primes_in_range(130, 300), 2)
     N = P * Q
     X = (P - 1) * (Q - 1)
     E = 2
@@ -55,7 +55,12 @@ def generate_key():
     D = 2
     while (D * E - 1) % X != 0:
         D = D + 1
-    print("The values of N, E and D are: ")
+    print("The keys are here: N=", N, "E=", E, "D=", D)
     return (N, E, D)
 
-generate_key()
+NED = generate_key()
+message = "Hello World"
+message_encrypted = encrypt(message, NED[0], NED[1])
+print(message_encrypted)
+message_decrypted = decrypt(message_encrypted, NED[0], NED[2])
+print(message_decrypted)
